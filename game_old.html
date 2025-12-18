@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tag Match Game | Portfolio</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="game.css" />
+</head>
+<body class="theme-dark">
+  <video class="bg-video" autoplay muted loop playsinline>
+    <source src="video.mp4" type="video/mp4" />
+  </video>
+  <div class="bg-overlay"></div>
+
+  <header id="navbar" class="nav-modern">
+    <div class="nav-left">
+      <div class="logo">YourName</div>
+    </div>
+    <div class="nav-right">
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <a href="works.html">Works</a>
+      </nav>
+      <a href="profile.html" class="btn nav-cta">Visit Me</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="game-wrapper fade-in">
+      <div class="game-header">
+        <p class="eyebrow">Pilipinas Picture Match</p>
+        <h1>Match famous Philippine images with their descriptions.</h1>
+        <p>
+          Click one <strong>image</strong> card and one <strong>description</strong> card.
+          If they match, they stay highlighted. Clear all pairs in the fewest attempts.
+        </p>
+      </div>
+
+      <div class="game-stats">
+        <div class="stat-pill">Attempts: <span id="attempts">0</span></div>
+        <div class="stat-pill">Matches: <span id="matches">0</span> / 6</div>
+      </div>
+
+      <div class="game-grid" id="gameGrid">
+        <!-- cards injected by game.js -->
+      </div>
+
+      <div class="game-message" id="gameMessage"></div>
+
+      <div class="game-actions">
+        <button class="btn ghost" id="resetGame">Shuffle & Play Again</button>
+        <a href="works.html" class="btn primary">Back to Works</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> YourName — UI/UX Designer & Developer</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

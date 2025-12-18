@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎰 Color Game Casino</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="color-game">
+  <div id="game">
+    <h1>🎰 Color Game Casino</h1>
+    <div class="stats">
+      <div class="stat balance" id="balance">Balance: ₱0</div>
+      <div class="stat" id="multiplier">Multiplier: x1.0</div>
+      <div class="stat win" id="total-win">Total Win: ₱0</div>
+      <div class="stat" id="streak">Streak: 0</div>
+    </div>
+        
+    <div class="game-box">
+      <div class="target-section">
+        <div id="target-color" style="background: #222;"></div>
+        <div id="timer">10</div>
+        <p style="font-size: 1.3em; margin: 15px 0; font-weight: bold;">Pick matching color FAST!</p>
+      </div>
+            
+      <div class="colors-container">
+        <h3 style="margin: 0 0 20px 0; color: #ffd700;">🎨 Color Wheel</h3>
+        <div class="colors-grid" id="colors">
+          <button class="color-btn" style="background: linear-gradient(145deg, #ff4444, #cc0000);" data-color="red">RED</button>
+          <button class="color-btn" style="background: linear-gradient(145deg, #44ff44, #00cc00);" data-color="green">GREEN</button>
+          <button class="color-btn" style="background: linear-gradient(145deg, #4444ff, #0000cc);" data-color="blue">BLUE</button>
+          <button class="color-btn" style="background: linear-gradient(145deg, #ffff44, #cccc00);" data-color="yellow">YELLOW</button>
+          <button class="color-btn" style="background: linear-gradient(145deg, #ff8844, #cc6600);" data-color="orange">ORANGE</button>
+          <button class="color-btn" style="background: linear-gradient(145deg, #aa44ff, #8800cc);" data-color="purple">PURPLE</button>
+        </div>
+      </div>
+    </div>
+        
+    <div class="controls">
+      <input type="number" id="bet-amount" placeholder="Bet ₱" value="10" min="1">
+      <input type="number" id="cash-amount" placeholder="Cash ₱" min="1">
+      <button id="cash-in">💰 Cash In</button>
+      <button id="cash-out">💸 Cash Out</button>
+      <button id="auto-bet">⚡ Auto Bet</button>
+      <button id="start">🎮 START ROUND</button>
+    </div>
+  </div>
+
+  <script>
+    let balance = 100;
+    let totalWin = 0;
+    let streak = 0;
+    let timer = 10;
+    let interval;
+    let targetColor = '';
+    let multiplier = 1.0;
+    let autoBet = false;
+    let betAmount = 10;
+    const colors = ['red', 'green', 'blue', 'yellow', 'orange', 'purple'];
+
+    const elements = {
+      balance: document.getElementById('balance'),
+      multiplier: document.getElementById('multiplier'),
+      totalWin: document.getElementById('total-win'),
+      streak: document.getElementById('streak'),
+      target: document.getElementById('target-color'),
+      timer: document.getElementById('timer'),
+      start: document.getElementById('start'),
+      betAmount: document.getElementById('bet-amount'),
+      cashAmount: document.getElementById('cash-amount')
+    };
+
+    function updateDisplay() {
+      elements.balance.textContent = `Balance: ₱${balance.toFixed(2)}`;
+      elements.multiplier.textContent = `Multiplier: x${multiplier.toFixed(1)}`;
+      elements.totalWin.textContent = `Total Win: ₱${totalWin.toFixed(2)}`;
+      elements.streak.textContent = `Streak: ${streak}`;
+    }
+
+    function generateTarget() {
+      targetColor = colors[Math.floor(Math.random() * colors.length)];
+      multiplier = (1 + Math.random() * 5).toFixed(1); // Up to 6x!
+      elements.target.style.background = targetColor;
+    }
+
+    function startTimer() {
+      timer = 10;
+      elements.timer.textContent = timer;
+      elements.timer.style.color = '#4ade80';
+            
+      interval = setInterval(() => {
+        timer--;
+        elements.timer.textContent = timer;
+                
+        if (timer <= 4) {
+          elements.timer.style.color = '#ff4444';
+          elements.timer.style.transform = 'scale(1.3)';
+        }
+                
+        if (timer <= 0) {
+          clearInterval(interval);
+          loseRound();
+        }
+      }, 1000);
+    }
+
+    function winRound() {
+      streak++;
+      let winMultiplier = parseFloat(multiplier);
+      if (streak >= 3) winMultiplier *= 1.5; // Streak bonus!
+      const win = betAmount * winMultiplier;
+      totalWin += win;
+      balance += win;
+      alert(`🎉 BIG WIN! +₱${win.toFixed(2)} (${streak}🔥 streak)`);
+      resetRound();
+    }
+
+    function loseRound() {
+      streak = 0;
+      alert('⏰ Time up! Better luck next round.');
+      resetRound();
+    }
+
+    function resetRound() {
+      clearInterval(interval);
+      elements.target.style.background = '#222';
+      elements.start.disabled = false;
+      document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.disabled = false;
+      });
+      updateDisplay();
+    }
+
+    document.getElementById('start').addEventListener('click', () => {
+      betAmount = parseFloat(elements.betAmount.value) || 10;
+      if (balance < betAmount) {
+        alert('💰 Insufficient balance!');
+        return;
+      }
+      balance -= betAmount;
+      updateDisplay();
+      generateTarget();
+      startTimer();
+      elements.start.disabled = true;
+      document.querySelectorAll('.color-btn').forEach(btn => btn.disabled = false);
+    });
+
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (timer <= 0) return;
+                
+        const picked = btn.dataset.color;
+        document.querySelectorAll('.color-btn').forEach(b => {
+          b.classList.remove('active');
+          b.disabled = true;
+        });
+        btn.classList.add('active');
+
+        clearInterval(interval);
+                
+        setTimeout(() => {
+          if (picked === targetColor) {
+            winRound();
+          } else {
+            loseRound();
+          }
+        }, 1000);
+      });
+    });
+
+    document.getElementById('cash-in').addEventListener('click', () => {
+      const amount = parseFloat(elements.cashAmount.value);
+      if (amount > 0) {
+        balance += amount;
+        updateDisplay();
+        elements.cashAmount.value = '';
+      }
+    });
+
+    document.getElementById('cash-out').addEventListener('click', () => {
+      if (balance > 0) {
+        alert(`💸 Cashed out ₱${balance.toFixed(2)}!`);
+        balance = 0;
+        updateDisplay();
+      }
+    });
+
+    document.getElementById('auto-bet').addEventListener('click', () => {
+      autoBet = !autoBet;
+      alert(autoBet ? '⚡ Auto Bet ON' : '⚡ Auto Bet OFF');
+    });
+
+    // Custom bet amount change
+    elements.betAmount.addEventListener('change', (e) => {
+      betAmount = parseFloat(e.target.value) || 10;
+    });
+
+    updateDisplay();
+  </script>
+</body>
+</html>
